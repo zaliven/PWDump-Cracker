@@ -1,21 +1,32 @@
 import hashlib, binascii
-import sys
-import argparser
-
-
-myParser = argparser.Parser()
-#collect hashes
+from argparser import get_cli_args
+from brute import bruteforce, getCharset
+'''
+python dump.py -f 127.0.0.1.pwdump -method bruteforce -range 3 -mode 124
+python dump.py -f 127.0.0.1.pwdump -method wordlist -wordlist=pass.txt
+'''
+args = get_cli_args()
+#collect hashes from pwdump
 hashes = []
-with open("127.0.0.1.pwdump") as f:
+with open(args.filename.name) as f:
     for line in f:
         separated = line.split(":")
         if("NO PASSWORD" not in separated[3]):
             hashes.append((separated[0], separated[3]))
 
-#we will compare output of word list to hashes
-with open('pass.txt') as passes:
-    for line in passes:
-        passw = line.strip("\n")
+if(args.method == "wordlist"):
+    with open(args.wordlist.name) as passes:
+        for line in passes:
+            passw = line.strip("\n")
+            for hashTuple in hashes:
+                if(hashlib.new('md4', passw.encode('utf-16le')).hexdigest().upper() == hashTuple[1]):
+                    print(hashTuple[0] + " : " + passw)
+else:
+    charset = getCharset(args.mode)
+    for attempt in bruteforce(charset, int(args.range)):
+        if (args.verbose):
+            print(attempt)
         for hashTuple in hashes:
-            if(hashlib.new('md4', passw.encode('utf-16le')).hexdigest().upper() == hashTuple[1]):
+            if(hashlib.new('md4', attempt.encode('utf-16le')).hexdigest().upper() == hashTuple[1]):
                 print(hashTuple[0] + " : " + passw)
+
