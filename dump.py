@@ -6,18 +6,18 @@ python dump.py -f 127.0.0.1.pwdump -method bruteforce -range 3 -mode 124
 python dump.py -f 127.0.0.1.pwdump -method wordlist -wordlist=pass.txt
 '''
 def testAttempt(attempt):
-    for hashTuple in hashes:
-        if(hashlib.new('md4', attempt.encode('utf-16le')).hexdigest().upper() == hashTuple[1]):
-            print(hashTuple[0] + " : " + attempt)
+    for userHashTuple in hashes:
+        if(hashlib.new('md4', attempt.encode('utf-16le')).hexdigest().upper() == userHashTuple[1]):
+            print(userHashTuple[0] + " : " + attempt)
 
 args = get_cli_args()
 #collect hashes from pwdump
 hashes = []
 with open(args.filename.name) as f:
     for line in f:
-        separated = line.split(":")
-        if("NO PASSWORD" not in separated[3]):
-            hashes.append((separated[0], separated[3]))
+        userHashTuple = line.split(":")
+        if("NO PASSWORD" not in userHashTuple[3]):
+            hashes.append((userHashTuple[0], userHashTuple[3]))
 
 if(args.method == "wordlist"):
     with open(args.wordlist.name) as passes:
