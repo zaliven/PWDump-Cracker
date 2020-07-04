@@ -4,7 +4,7 @@ Attempts to crack a pwdump file with either a wordlist attack or brute force.
 Before using this tool you need to have a pwdump file - it is possible to get one using the fgdump tool.
 
 
-# Usage
+## Usage
 ```
 python dump.py -f FILENAME -method wordlist -wordlist WORDLIST
 ;
